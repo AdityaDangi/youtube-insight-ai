@@ -1,13 +1,18 @@
+import streamlit as st
 from googleapiclient.discovery import build
 import pandas as pd
 from datetime import datetime
 
 
 # =====================================
-# YouTube API KEY
+# YouTube API KEY (from Streamlit Secrets)
 # =====================================
-API_KEY = "AIzaSyDNUOe0OpvxQzQnp0VtZxVcpnRfogvgxMg"   # replace with your key
+API_KEY = st.secrets["YOUTUBE_API_KEY"]
 
+
+# =====================================
+# Build YouTube client
+# =====================================
 youtube = build(
     "youtube",
     "v3",
@@ -16,7 +21,7 @@ youtube = build(
 
 
 # =====================================
-# Fetch video comments (FULL VERSION)
+# Fetch video comments
 # =====================================
 def get_video_comments(video_id, max_results=500):
 
@@ -45,9 +50,11 @@ def get_video_comments(video_id, max_results=500):
                     "timestamp": datetime.now()
                 })
 
+            # Stop if limit reached
             if len(comments) >= max_results:
                 break
 
+            # Pagination
             if "nextPageToken" in response:
 
                 request = youtube.commentThreads().list(
@@ -114,7 +121,6 @@ def get_channel_videos(channel_name, max_results=10):
 
     try:
 
-        # Search channel
         search_request = youtube.search().list(
             part="snippet",
             q=channel_name,
@@ -129,7 +135,6 @@ def get_channel_videos(channel_name, max_results=10):
 
         channel_id = search_response["items"][0]["snippet"]["channelId"]
 
-        # Fetch videos
         videos_request = youtube.search().list(
             part="snippet",
             channelId=channel_id,
