@@ -1,0 +1,9 @@
+streamlit
+pandas
+plotly
+matplotlib
+wordcloud
+google-api-python-client
+scikit-learn
+textblob
+sqlalchemy
