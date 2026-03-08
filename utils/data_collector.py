@@ -4,16 +4,16 @@ import os
 
 from utils.youtube_api import get_video_comments
 from utils.db_manager import insert_comments
-from utils.predict import predict_sentiment   # ✅ IMPORTANT
+from utils.predict import predict_sentiment   
 
 
 def collect_and_save_comments(video_id):
 
     print("Fetching comments from YouTube API...")
 
-    # =====================================
+   
     # Fetch comments from API
-    # =====================================
+    
     df = get_video_comments(video_id)
 
     # Handle empty case
@@ -22,16 +22,16 @@ def collect_and_save_comments(video_id):
         return None, None
 
 
-    # =====================================
+    
     # Ensure required columns exist
-    # =====================================
+    
     if "timestamp" not in df.columns:
         df["timestamp"] = datetime.datetime.now()
 
 
-    # =====================================
-    # ✅ REAL SENTIMENT ANALYSIS (FIX)
-    # =====================================
+    
+    #  REAL SENTIMENT ANALYSIS (FIX)
+    
     print("Running sentiment analysis...")
 
     df["sentiment"] = df["comment"].apply(
@@ -42,15 +42,15 @@ def collect_and_save_comments(video_id):
     print("Sentiment analysis completed.")
 
 
-    # =====================================
+    
     # Create data folder if not exists
-    # =====================================
+    
     os.makedirs("data", exist_ok=True)
 
 
-    # =====================================
+   
     # Save individual video dataset
-    # =====================================
+    
     filename = f"data/comments_{video_id}.csv"
 
     df.to_csv(filename, index=False)
@@ -58,9 +58,9 @@ def collect_and_save_comments(video_id):
     print(f"Saved individual dataset: {filename}")
 
 
-    # =====================================
+    
     # Save master dataset
-    # =====================================
+    
     master_file = "data/master_dataset.csv"
 
     try:
@@ -82,9 +82,9 @@ def collect_and_save_comments(video_id):
     print("Updated master_dataset.csv")
 
 
-    # =====================================
+  
     # Save to SQL database
-    # =====================================
+    
     try:
 
         insert_comments(df)
@@ -96,9 +96,9 @@ def collect_and_save_comments(video_id):
         print("Database insert failed:", str(e))
 
 
-    # =====================================
+    
     # Show summary
-    # =====================================
+    
     positive = (df["sentiment"] == "positive").sum()
     negative = (df["sentiment"] == "negative").sum()
 
@@ -107,7 +107,7 @@ def collect_and_save_comments(video_id):
     print(f"Total comments: {len(df)}")
 
 
-    # =====================================
+
     # Return dataframe and filename
-    # =====================================
+  
     return df, filename

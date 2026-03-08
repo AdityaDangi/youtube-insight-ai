@@ -4,15 +4,15 @@ import pandas as pd
 from datetime import datetime
 
 
-# =====================================
+
 # YouTube API KEY (from Streamlit Secrets)
-# =====================================
+
 API_KEY = st.secrets["YOUTUBE_API_KEY"]
 
 
-# =====================================
+
 # Build YouTube client
-# =====================================
+
 youtube = build(
     "youtube",
     "v3",
@@ -20,9 +20,9 @@ youtube = build(
 )
 
 
-# =====================================
+
 # Fetch video comments
-# =====================================
+
 def get_video_comments(video_id, max_results=500):
 
     comments = []
@@ -81,9 +81,9 @@ def get_video_comments(video_id, max_results=500):
         return pd.DataFrame(columns=["video_id", "comment", "timestamp"])
 
 
-# =====================================
+
 # Fetch video metadata
-# =====================================
+
 def get_video_details(video_id):
 
     try:
@@ -114,9 +114,9 @@ def get_video_details(video_id):
         return None
 
 
-# =====================================
+
 # Fetch channel videos
-# =====================================
+
 def get_channel_videos(channel_name, max_results=10):
 
     try:
@@ -166,9 +166,9 @@ def get_channel_videos(channel_name, max_results=10):
         return []
 
 
-# =====================================
+
 # Fetch channel details
-# =====================================
+
 def get_channel_details(channel_name):
 
     try:

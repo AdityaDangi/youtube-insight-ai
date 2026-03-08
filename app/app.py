@@ -1,6 +1,6 @@
-# =====================================
-# FIX: Connect project root to Streamlit
-# =====================================
+
+# Connect project root to Streamlit
+
 import sys
 import os
 
@@ -10,9 +10,8 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 
-# =====================================
 # Imports
-# =====================================
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -27,19 +26,19 @@ from utils.data_analysis import analyze_comments
 from utils.db_manager import fetch_all_comments, insert_comments
 
 
-# =====================================
+
 # Page Configuration
-# =====================================
+
 st.set_page_config(
     page_title="YouTube Insight Engine",
-    page_icon="📊",
+    
     layout="wide"
 )
 
 
-# =====================================
+
 # Extract video ID safely
-# =====================================
+
 def extract_video_id(url):
 
     try:
@@ -60,10 +59,10 @@ def extract_video_id(url):
         return None
 
 
-# =====================================
+
 # Sidebar Navigation
-# =====================================
-st.sidebar.title("📊 YouTube Insight Engine")
+
+st.sidebar.title("YouTube Insight Engine")
 
 page = st.sidebar.selectbox(
     "Navigation",
@@ -79,9 +78,9 @@ page = st.sidebar.selectbox(
 )
 
 
-# =====================================
+
 # Save Analysis History
-# =====================================
+
 def save_history(video_url, positive, negative, total):
 
     data = {
@@ -109,12 +108,12 @@ def save_history(video_url, positive, negative, total):
     history.to_csv(history_file, index=False)
 
 
-# =====================================
+
 # DASHBOARD PAGE
-# =====================================
+
 if page == "Dashboard":
 
-    st.title("📊 YouTube Video Analytics Dashboard")
+    st.title("YouTube Video Analytics Dashboard")
 
     video_url = st.text_input("Enter YouTube Video URL")
 
@@ -128,14 +127,14 @@ if page == "Dashboard":
             st.stop()
 
 
-        # =====================================
+       
         # VIDEO METADATA
-        # =====================================
+      
         video_info = get_video_details(video_id)
 
         if video_info:
 
-            st.subheader("📺 Video Information")
+            st.subheader("Video Information")
 
             st.write("Title:", video_info["title"])
             st.write("Channel:", video_info["channel"])
@@ -147,9 +146,9 @@ if page == "Dashboard":
             col_meta3.metric("Comments", f"{video_info['comments']:,}")
 
 
-        # =====================================
+        
         # COLLECT COMMENTS
-        # =====================================
+        
         with st.spinner("Collecting comments from YouTube..."):
 
             df_collected, filename = collect_and_save_comments(video_id)
@@ -162,17 +161,17 @@ if page == "Dashboard":
         st.success(f"Dataset saved: {filename}")
 
 
-        # =====================================
+        
         # SENTIMENT ANALYSIS
-        # =====================================
+        
         with st.spinner("Running sentiment analysis..."):
 
             df_collected["sentiment"] = df_collected["comment"].apply(predict_sentiment)
 
 
-        # =====================================
+        
         # UPDATE MASTER DATASET
-        # =====================================
+       
         master_file = os.path.join(PROJECT_ROOT, "data", "master_dataset.csv")
 
         try:
@@ -190,9 +189,9 @@ if page == "Dashboard":
         master_df.to_csv(master_file, index=False)
 
 
-        # =====================================
+       
         # UPDATE SQL DATABASE
-        # =====================================
+        
         try:
 
             insert_comments(df_collected)
@@ -204,12 +203,12 @@ if page == "Dashboard":
             st.warning(f"Database update failed: {e}")
 
 
-        # =====================================
+       
         # DATASET STATISTICS
-        # =====================================
+        
         analysis = analyze_comments(df_collected)
 
-        st.subheader("📈 Dataset Statistics")
+        st.subheader("Dataset Statistics")
 
         col1, col2, col3 = st.columns(3)
 
@@ -218,9 +217,9 @@ if page == "Dashboard":
         col3.metric("Median Length", round(analysis["median_length"], 2))
 
 
-        # =====================================
+       
         # SENTIMENT OVERVIEW
-        # =====================================
+        
         sentiment_counts = df_collected["sentiment"].value_counts()
 
         positive = sentiment_counts.get("positive", 0)
@@ -229,7 +228,7 @@ if page == "Dashboard":
 
         save_history(video_url, positive, negative, total)
 
-        st.subheader("📊 Sentiment Overview")
+        st.subheader("Sentiment Overview")
 
         col1, col2, col3 = st.columns(3)
 
@@ -238,9 +237,9 @@ if page == "Dashboard":
         col3.metric("Negative", negative)
 
 
-        # =====================================
+       
         # PIE CHART
-        # =====================================
+      
         st.subheader("Sentiment Distribution")
 
         fig = px.pie(
@@ -252,9 +251,9 @@ if page == "Dashboard":
         st.plotly_chart(fig, use_container_width=True)
 
 
-        # =====================================
+        
         # TIMELINE CHART
-        # =====================================
+        
         st.subheader("Sentiment Timeline")
 
         df_collected["index"] = range(len(df_collected))
@@ -268,9 +267,9 @@ if page == "Dashboard":
         st.plotly_chart(fig_line, use_container_width=True)
 
 
-        # =====================================
+        
         # WORD CLOUD
-        # =====================================
+       
         st.subheader("WordCloud")
 
         text = " ".join(df_collected["comment"].astype(str))
@@ -289,17 +288,17 @@ if page == "Dashboard":
         st.pyplot(fig_wc)
 
 
-        # =====================================
+        
         # DATASET VIEW
-        # =====================================
+       
         st.subheader("Dataset Explorer")
 
         st.dataframe(df_collected, use_container_width=True)
 
 
-        # =====================================
+        
         # DOWNLOAD REPORT
-        # =====================================
+        
         csv = df_collected.to_csv(index=False)
 
         st.download_button(
@@ -309,12 +308,12 @@ if page == "Dashboard":
         )
 
 
-# =====================================
+
 # CHANNEL ANALYTICS
-# =====================================
+
 elif page == "Channel Analytics":
 
-    st.title("📺 Channel Analytics")
+    st.title("Channel Analytics")
 
     df = fetch_all_comments()
 
@@ -343,12 +342,12 @@ elif page == "Channel Analytics":
     st.plotly_chart(fig2, use_container_width=True)
 
 
-# =====================================
+
 # VIDEO COMPARISON
-# =====================================
+
 elif page == "Video Comparison":
 
-    st.title("📊 Video Comparison")
+    st.title("Video Comparison")
 
     df = fetch_all_comments()
 
@@ -372,9 +371,9 @@ elif page == "Video Comparison":
     st.plotly_chart(fig, use_container_width=True)
 
 
-# =====================================
+
 # DATASET EXPLORER
-# =====================================
+
 elif page == "Dataset Explorer":
 
     st.title("Dataset Explorer")
@@ -392,9 +391,9 @@ elif page == "Dataset Explorer":
         st.warning("No dataset found")
 
 
-# =====================================
+
 # DATABASE EXPLORER
-# =====================================
+
 elif page == "Database Explorer":
 
     st.title("Database Explorer")
@@ -410,9 +409,9 @@ elif page == "Database Explorer":
         st.dataframe(df)
 
 
-# =====================================
+
 # HISTORY
-# =====================================
+
 elif page == "Analysis History":
 
     st.title("Analysis History")
@@ -430,9 +429,9 @@ elif page == "Analysis History":
         st.warning("No history found")
 
 
-# =====================================
+
 # ABOUT PAGE
-# =====================================
+
 elif page == "About Project":
 
     st.title("YouTube Insight Engine")
